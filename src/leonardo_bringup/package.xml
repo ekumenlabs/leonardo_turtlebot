@@ -6,6 +6,7 @@
   </description>
   <author>Tully Foote</author>
   <maintainer email="ecorbellini@ekumenlabs.com">Ernesto Corbellini</maintainer>
+  <maintainer email="jmateu@ekumenlabs.com">Julian Mateu</maintainer>
   <license>BSD</license>
   <url type="website">http://ros.org/wiki/turtlebot_bringup</url>
   <url type="repository">https://github.com/turtlebot/turtlebot</url>

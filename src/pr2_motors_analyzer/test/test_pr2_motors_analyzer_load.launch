@@ -1,0 +1,7 @@
+<launch>
+  <test pkg="diagnostic_aggregator" type="analyzer_loader"
+        name="loader" test-name="pr2_motors_analyzer_load_test" >
+    <rosparam command="load"
+              file="$(find pr2_motors_analyzer)/test/pr2_motors_analyzer_load.yaml" />
+  </test>
+</launch>

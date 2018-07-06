@@ -1,0 +1,7 @@
+<library path="lib/libpr2_motors_analyzer" >
+  <class name="PR2MotorsAnalyzer" type="diagnostic_aggregator::PR2MotorsAnalyzer" base_class_type="diagnostic_aggregator::Analyzer">
+    <description>
+      PR2MotorsAnalyzer is tutorial for writing diagnostic analyzers.
+    </description>
+  </class>
+</library>

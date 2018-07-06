@@ -1,0 +1,4 @@
+analyzers:
+  motors:
+    type: PR2MotorsAnalyzer
+    power_board_name: Power board 1000

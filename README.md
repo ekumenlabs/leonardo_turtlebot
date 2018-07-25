@@ -1,10 +1,10 @@
-##Get started
+## Get started
 To build and run the code in this project you'll need to install `ros` and `catkin` following the tutorial beneath:
 
-⋅⋅* [http://wiki.ros.org/kinetic/Installation/Ubuntu](http://wiki.ros.org/kinetic/Installation/Ubuntu)
-⋅⋅* [http://wiki.ros.org/catkin](http://wiki.ros.org/catkin)
+* [http://wiki.ros.org/kinetic/Installation/Ubuntu](http://wiki.ros.org/kinetic/Installation/Ubuntu)
+* [http://wiki.ros.org/catkin](http://wiki.ros.org/catkin)
 
-##Building
+## Building
 To build the project execute the following lines:
 
 `catkin_make`
@@ -18,6 +18,6 @@ In any case if you need to try something out in your pc or rerun the script on L
 
 `./start_leonardo_turtle.sh`
 
-##Useful links
-⋅⋅* [http://wiki.ros.org/catkin/Tutorials](http://wiki.ros.org/catkin/Tutorials)
-⋅⋅* [http://wiki.ros.org/turtlebot/Tutorials/indigo](http://wiki.ros.org/turtlebot/Tutorials/indigo)
+## Useful links
+* [http://wiki.ros.org/catkin/Tutorials](http://wiki.ros.org/catkin/Tutorials)
+* [http://wiki.ros.org/turtlebot/Tutorials/indigo](http://wiki.ros.org/turtlebot/Tutorials/indigo)

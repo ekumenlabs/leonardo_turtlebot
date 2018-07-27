@@ -19,9 +19,7 @@ class AutoDocking:
         self._go_docking = False
 
     def _doneCb(self, status, result):
-        if 0:   
-            print ''
-        elif status == GoalStatus.PENDING   : state='PENDING'
+        if status == GoalStatus.PENDING   : state='PENDING'
         elif status == GoalStatus.ACTIVE    : state='ACTIVE'
         elif status == GoalStatus.PREEMPTED : state='PREEMPTED'
         elif status == GoalStatus.SUCCEEDED : state='SUCCEEDED'
@@ -43,7 +41,9 @@ class AutoDocking:
         goal = AutoDockingGoal()
         self._client.send_goal(goal, done_cb=self._doneCb, feedback_cb=self._feedbackCb)
         print 'Goal: Sent.'
+        rospy.on_shutdown(self._client.cancel_goal)
         self._go_docking = False
+
     
     def _listen_batteries(self, data):
         batteries_names = ['/Power System/Laptop Battery', "/Power System/Battery"]
@@ -59,6 +59,7 @@ class AutoDocking:
 
     def run(self):
         rospy.spin()
+
 
 
 if __name__ == '__main__':

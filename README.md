@@ -11,7 +11,7 @@ To build the project execute the following lines:
 
 ``` source /devel/setup.bash ```
 
-> Note: Everytime you make a change on any script you have to rebuild the project executing this lines.
+> Note: Everytime you make a change on any script you have to rebuild the project executing these lines.
 
 ## Running manualy
 Leonardo runs automatically the following script when it boots. 

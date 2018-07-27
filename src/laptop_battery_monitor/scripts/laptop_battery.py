@@ -249,7 +249,6 @@ class LaptopBatteryMonitor(object):
 
         # Battery info
         self._batt_acpi_path = rospy.get_param('~acpi_path', "/sys/class/power_supply/BAT0")
-        # self._batt_acpi_path = rospy.get_param('~acpi_path', "/home/tul1/Desktop/MOCK_BAT")
 
         self._batt_design_capacity = 0
         self._batt_last_full_capacity = 0

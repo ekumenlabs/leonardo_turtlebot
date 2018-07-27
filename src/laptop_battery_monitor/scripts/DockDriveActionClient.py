@@ -10,7 +10,7 @@ from diagnostic_msgs.msg import DiagnosticArray
 
 
 class AutoDocking:
-    BATTERY_THRESHOLD = 50
+    BATTERY_THRESHOLD = 4
 
     def __init__(self):
         self._ros_node = rospy.init_node('dock_drive_client_py', anonymous=True)
@@ -53,7 +53,7 @@ class AutoDocking:
         
         if self._go_docking is False:
             if kuboki_battery_percentage < self.BATTERY_THRESHOLD or laptop_battery_percentage < self.BATTERY_THRESHOLD:
-                print 'docking'
+                print kuboki_battery_percentage
                 self._dock_drive_client()
                 self._go_docking = True
 

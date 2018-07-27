@@ -18,8 +18,7 @@ class AutoDocking:
         self._diagnostic_agg_sub = rospy.Subscriber("/diagnostics_agg", DiagnosticArray, self._listen_batteries)
         self._go_docking = False
 
-    def _doneCb(status, result):
-        print "it is docked"
+    def _doneCb(self, status, result):
         if 0:   
             print ''
         elif status == GoalStatus.PENDING   : state='PENDING'
@@ -35,20 +34,16 @@ class AutoDocking:
         # Print state of action server
         print 'Result - [ActionServer: ' + state + ']: ' + result.text
 
-    def _feedbackCb(feedback):
+    def _feedbackCb(self, feedback):
         print 'Feedback: [DockDrive: ' + feedback.state + ']: ' + feedback.text
 
     def _dock_drive_client(self):
-        while not self._client.wait_for_server(rospy.Duration(5.0)):
-            if rospy.is_shutdown(): 
-                return
-            print 'Action server is not connected yet. still waiting...'
-            
-            goal = AutoDockingGoal()
-            self._client.send_goal(goal, done_cb=self._doneCb, feedback_cb=self._feedbackCb)
-            print 'Goal: Sent.'
-
-            self._go_docking = False
+        if rospy.is_shutdown(): 
+            return        
+        goal = AutoDockingGoal()
+        self._client.send_goal(goal, done_cb=self._doneCb, feedback_cb=self._feedbackCb)
+        print 'Goal: Sent.'
+        self._go_docking = False
     
     def _listen_batteries(self, data):
         batteries_names = ['/Power System/Laptop Battery', "/Power System/Battery"]

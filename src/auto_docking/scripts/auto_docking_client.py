@@ -29,19 +29,18 @@ class AutoDocking:
         elif status == GoalStatus.RECALLING: state='RECALLING'
         elif status == GoalStatus.RECALLED: state='RECALLED'
         elif status == GoalStatus.LOST: state='LOST'
-        # Print state of action server
-        print 'Result - [ActionServer: ' + state + ']: ' + result.text
+        rospy.logdebug('Result - [ActionServer: ' + state + ']: ' + result.text)
         self._go_docking = False
 
     def _feedbackCb(self, feedback):
-        print 'Feedback: [DockDrive: ' + feedback.state + ']: ' + feedback.text
+        rospy.logdebug('Feedback: [DockDrive: ' + feedback.state + ']: ' + feedback.text)
 
     def _dock_drive_client(self):
         if rospy.is_shutdown(): 
             return        
         goal = AutoDockingGoal()
         self._client.send_goal(goal, done_cb=self._doneCb, feedback_cb=self._feedbackCb)
-        print 'Goal: Sent.'
+        rospy.logdebug('Goal: Sent.')
         rospy.on_shutdown(self._client.cancel_goal)
         self._go_docking = False
     
@@ -53,7 +52,6 @@ class AutoDocking:
         
         if self._go_docking is False:
             if kuboki_battery_percentage < self.BATTERY_THRESHOLD or laptop_battery_percentage < self.BATTERY_THRESHOLD:
-                print kuboki_battery_percentage
                 self._dock_drive_client()
                 self._go_docking = True
 
@@ -66,4 +64,4 @@ if __name__ == '__main__':
         autodock = AutoDocking()
         autodock.run()
     except rospy.ROSInterruptException: 
-        print "program interrupted before completion"
+        rospy.logdebug("program interrupted before completion")

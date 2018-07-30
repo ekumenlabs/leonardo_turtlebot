@@ -19,18 +19,19 @@ class AutoDocking:
         self._go_docking = False
 
     def _doneCb(self, status, result):
-        if status == GoalStatus.PENDING   : state='PENDING'
-        elif status == GoalStatus.ACTIVE    : state='ACTIVE'
-        elif status == GoalStatus.PREEMPTED : state='PREEMPTED'
-        elif status == GoalStatus.SUCCEEDED : state='SUCCEEDED'
-        elif status == GoalStatus.ABORTED   : state='ABORTED'
-        elif status == GoalStatus.REJECTED  : state='REJECTED'
+        if status == GoalStatus.PENDING: state='PENDING'
+        elif status == GoalStatus.ACTIVE: state='ACTIVE'
+        elif status == GoalStatus.PREEMPTED: state='PREEMPTED'
+        elif status == GoalStatus.SUCCEEDED: state='SUCCEEDED'
+        elif status == GoalStatus.ABORTED: state='ABORTED'
+        elif status == GoalStatus.REJECTED: state='REJECTED'
         elif status == GoalStatus.PREEMPTING: state='PREEMPTING'
-        elif status == GoalStatus.RECALLING : state='RECALLING'
-        elif status == GoalStatus.RECALLED  : state='RECALLED'
-        elif status == GoalStatus.LOST      : state='LOST'
+        elif status == GoalStatus.RECALLING: state='RECALLING'
+        elif status == GoalStatus.RECALLED: state='RECALLED'
+        elif status == GoalStatus.LOST: state='LOST'
         # Print state of action server
         print 'Result - [ActionServer: ' + state + ']: ' + result.text
+        self._go_docking = False
 
     def _feedbackCb(self, feedback):
         print 'Feedback: [DockDrive: ' + feedback.state + ']: ' + feedback.text
@@ -43,7 +44,6 @@ class AutoDocking:
         print 'Goal: Sent.'
         rospy.on_shutdown(self._client.cancel_goal)
         self._go_docking = False
-
     
     def _listen_batteries(self, data):
         batteries_names = ['/Power System/Laptop Battery', "/Power System/Battery"]
@@ -59,7 +59,6 @@ class AutoDocking:
 
     def run(self):
         rospy.spin()
-
 
 
 if __name__ == '__main__':

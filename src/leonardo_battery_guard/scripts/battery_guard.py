@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import roslib; roslib.load_manifest('kobuki_auto_docking')
 import rospy
 
 import actionlib
@@ -48,7 +47,7 @@ class AutoDocking:
         batteries_names = ['/Power System/Laptop Battery', "/Power System/Battery"]
         batteries_values = [element.values for element in data.status if element.name in batteries_names]
         laptop_battery_percentage = float(filter(lambda x: x.key == "Percentage (%)", batteries_values[0])[0].value)
-        kuboki_battery_percentage = float(filter(lambda x: x.key == "Percent", batteries_values[1])[0].value)
+        kubuki_battery_percentage = float(filter(lambda x: x.key == "Percent", batteries_values[1])[0].value)
         
         if self._go_docking is False:
             if kuboki_battery_percentage < self.BATTERY_THRESHOLD or laptop_battery_percentage < self.BATTERY_THRESHOLD:

@@ -1,9 +1,9 @@
 <package>
-  <name>auto_docking</name>
+  <name>leonardo_battery_guard</name>
   <version>0.1.103</version>
 
   <description>
-    The auto_docking package
+    Package that watch Leonardo's battery and dock it if necessary.
   </description>
   <maintainer email="ecorbellini@ekumenlabs.com">Ernesto Corbellini</maintainer>
   <maintainer email="jmateu@ekumenlabs.com">Julian Mateu</maintainer>

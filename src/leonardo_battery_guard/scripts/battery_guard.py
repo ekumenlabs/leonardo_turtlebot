@@ -22,11 +22,11 @@ class AutoDocking(object):
         self._ros_node = rospy.init_node("dock_drive_client", anonymous=True)
         self._client = actionlib.SimpleActionClient("dock_drive_action", AutoDockingAction)
         self._diagnostic_agg_sub = rospy.Subscriber("/diagnostics_agg", DiagnosticArray, self._listen_batteries)
-        self._go_docking = False
+        self._doing_docking = False
         self.BATTERY_THRESHOLD = rospy.get_param("~battery_threshold", 10)
 
     def _doneCb(self, status, result):
-        """Callback that prints the action goal status and change the state of _go_docking attribute. 
+        """Callback that prints the action goal status and change the state of _doing_docking attribute. 
         This function is called when the action goal is reached."""
         if status == GoalStatus.PENDING: state="PENDING"
         elif status == GoalStatus.ACTIVE: state="ACTIVE"
@@ -39,7 +39,7 @@ class AutoDocking(object):
         elif status == GoalStatus.RECALLED: state="RECALLED"
         elif status == GoalStatus.LOST: state="LOST"
         rospy.logdebug("Result - [ActionServer: " + state + "]: " + result.text)
-        self._go_docking = False
+        self._doing_docking = False
 
     def _feedbackCb(self, feedback):
         """Callback that just prints the action feedback."""
@@ -53,7 +53,7 @@ class AutoDocking(object):
         self._client.send_goal(goal, done_cb=self._doneCb, feedback_cb=self._feedbackCb)
         rospy.logdebug("Goal: Sent.")
         rospy.on_shutdown(self._client.cancel_goal)
-        self._go_docking = False
+        self._doing_docking = False
     
     def _listen_batteries(self, data):
         """Callback that checks the batteries charge and triggers the auto docking routine if the charge is low."""
@@ -62,10 +62,10 @@ class AutoDocking(object):
         laptop_battery_percentage = float(filter(lambda x: x.key == "Percentage (%)", batteries_values[0])[0].value)
         kubuki_battery_percentage = float(filter(lambda x: x.key == "Percent", batteries_values[1])[0].value)
         
-        if self._go_docking is False:
+        if self._doing_docking is False:
             if kuboki_battery_percentage < self.BATTERY_THRESHOLD or laptop_battery_percentage < self.BATTERY_THRESHOLD:
                 self._go_dock()
-                self._go_docking = True
+                self._doing_docking = True
 
     def run(self):
         rospy.spin()

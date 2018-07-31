@@ -12,6 +12,11 @@ class AutoDocking:
     BATTERY_THRESHOLD = 4
 
     def __init__(self):
+
+        # params = rospy.get_param('~flight_without_shell')
+        # print params
+
+
         self._ros_node = rospy.init_node('dock_drive_client_py', anonymous=True)
         self._client = actionlib.SimpleActionClient('dock_drive_action', AutoDockingAction)
         self._diagnostic_agg_sub = rospy.Subscriber("/diagnostics_agg", DiagnosticArray, self._listen_batteries)

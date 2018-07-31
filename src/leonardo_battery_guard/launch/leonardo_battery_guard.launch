@@ -1,6 +1,6 @@
 
 <launch>
-    <node name="dock_drive_client_py" pkg="leonardo_battery_guard" type="battery_guard.py" clear_params="true" output="screen">
+    <node name="dock_drive_client" pkg="leonardo_battery_guard" type="battery_guard.py" clear_params="true" output="screen">
         <param name="battery_threshold" value="10" />
     </node>
 </launch>

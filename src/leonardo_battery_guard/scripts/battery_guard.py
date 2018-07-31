@@ -1,4 +1,14 @@
 #!/usr/bin/env python
+#
+# Software License Agreement (BSD License)
+#
+# Description: This code creates a ros node in charge of watching the turtlebot Leonardo's batteries
+# and autodocking it in it's charging station if the battery level is too low. This code has been influenced by the kobuki
+# autodocking routine form https://github.com/yujinrobot/kobuki/blob/devel/kobuki_auto_docking/scripts/DockDriveActionClient.py
+#
+# author: Patricio Tula
+# reviewed by: Ernesto Corbellini / Julian Mateu
+
 
 import rospy
 
@@ -9,18 +19,13 @@ from diagnostic_msgs.msg import DiagnosticArray
 
 
 class AutoDocking:
-    BATTERY_THRESHOLD = 4
 
     def __init__(self):
-
-        # params = rospy.get_param('~flight_without_shell')
-        # print params
-
-
         self._ros_node = rospy.init_node('dock_drive_client_py', anonymous=True)
         self._client = actionlib.SimpleActionClient('dock_drive_action', AutoDockingAction)
         self._diagnostic_agg_sub = rospy.Subscriber("/diagnostics_agg", DiagnosticArray, self._listen_batteries)
         self._go_docking = False
+        self.BATTERY_THRESHOLD = rospy.get_param('~battery_threshold', 10)
 
     def _doneCb(self, status, result):
         if status == GoalStatus.PENDING: state='PENDING'

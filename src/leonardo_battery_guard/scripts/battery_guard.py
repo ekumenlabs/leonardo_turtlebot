@@ -18,7 +18,6 @@ from diagnostic_msgs.msg import DiagnosticArray
 
 
 class AutoDocking(object):
-
     def __init__(self):
         self._ros_node = rospy.init_node("dock_drive_client", anonymous=True)
         self._client = actionlib.SimpleActionClient("dock_drive_action", AutoDockingAction)
@@ -27,6 +26,8 @@ class AutoDocking(object):
         self.BATTERY_THRESHOLD = rospy.get_param("~battery_threshold", 10)
 
     def _doneCb(self, status, result):
+        """Callback that prints the action goal status and change the state of _go_docking attribute. 
+        This function is called when the action goal is reached."""
         if status == GoalStatus.PENDING: state="PENDING"
         elif status == GoalStatus.ACTIVE: state="ACTIVE"
         elif status == GoalStatus.PREEMPTED: state="PREEMPTED"
@@ -41,9 +42,11 @@ class AutoDocking(object):
         self._go_docking = False
 
     def _feedbackCb(self, feedback):
+        """Callback that just prints the action feedback."""
         rospy.logdebug("Feedback: [DockDrive: " + feedback.state + "]: " + feedback.text)
 
     def _go_dock(self):
+        """Runs auto docking routine for a turtlebot."""
         if rospy.is_shutdown(): 
             return        
         goal = AutoDockingGoal()
@@ -53,6 +56,7 @@ class AutoDocking(object):
         self._go_docking = False
     
     def _listen_batteries(self, data):
+        """Callback that checks the batteries charge and triggers the auto docking routine if the charge is low."""
         batteries_names = ["/Power System/Laptop Battery", "/Power System/Battery"]
         batteries_values = [element.values for element in data.status if element.name in batteries_names]
         laptop_battery_percentage = float(filter(lambda x: x.key == "Percentage (%)", batteries_values[0])[0].value)

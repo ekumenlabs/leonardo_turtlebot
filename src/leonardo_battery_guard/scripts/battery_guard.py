@@ -60,10 +60,10 @@ class AutoDocking(object):
         batteries_names = ["/Power System/Laptop Battery", "/Power System/Battery"]
         batteries_values = [element.values for element in data.status if element.name in batteries_names]
         laptop_battery_percentage = float(filter(lambda x: x.key == "Percentage (%)", batteries_values[0])[0].value)
-        kubuki_battery_percentage = float(filter(lambda x: x.key == "Percent", batteries_values[1])[0].value)
+        kobuki_battery_percentage = float(filter(lambda x: x.key == "Percent", batteries_values[1])[0].value)
         
         if self._doing_docking is False:
-            if kuboki_battery_percentage < self.BATTERY_THRESHOLD or laptop_battery_percentage < self.BATTERY_THRESHOLD:
+            if kobuki_battery_percentage < self.BATTERY_THRESHOLD or laptop_battery_percentage < self.BATTERY_THRESHOLD:
                 self._go_dock()
                 self._doing_docking = True
 

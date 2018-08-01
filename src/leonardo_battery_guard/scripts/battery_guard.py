@@ -15,17 +15,27 @@ import actionlib
 from kobuki_msgs.msg import AutoDockingAction, AutoDockingGoal
 from actionlib_msgs.msg import GoalStatus
 from diagnostic_msgs.msg import DiagnosticArray
+from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 
 
 class AutoDocking(object):
     def __init__(self):
+        # Node
         self._ros_node = rospy.init_node("dock_drive_client", anonymous=True)
-        self._client = actionlib.SimpleActionClient("dock_drive_action", AutoDockingAction)
+        # Action clients 
+        self._docking_client = actionlib.SimpleActionClient("dock_drive_action", AutoDockingAction)
+        self._navigation_client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
+        # Subscribed topics
         self._diagnostic_agg_sub = rospy.Subscriber("/diagnostics_agg", DiagnosticArray, self._listen_batteries)
+        # Logic attributes
         self._doing_docking = False
+        # Constants
         self.BATTERY_THRESHOLD = rospy.get_param("~battery_threshold", 10)
+        # TODO set POSITION_GOAL through ros params
+        # TODO find out the right position and orientation 
+        self.POSITION_GOAL = {"position": [0, 0, 0], "orientation":[0,0,0,0]}
 
-    def _doneCb(self, status, result):
+    def _done_docking(self, status, result):
         """Callback that prints the action goal status and change the state of _doing_docking attribute. 
         This function is called when the action goal is reached."""
         if status == GoalStatus.PENDING: state="PENDING"
@@ -41,31 +51,45 @@ class AutoDocking(object):
         rospy.logdebug("Result - [ActionServer: " + state + "]: " + result.text)
         self._doing_docking = False
 
-    def _feedbackCb(self, feedback):
+    def _feedback_docking(self, feedback):
         """Callback that just prints the action feedback."""
         rospy.logdebug("Feedback: [DockDrive: " + feedback.state + "]: " + feedback.text)
+
+    def _done_navigating(self, status, result):
+        """Runs auto docking routine for a turtlebot."""
+        rospy.logdebug("Result - [ActionServer: " + state + "]: " + result.text)
+        goal = AutoDockingGoal()
+        self._docking_client.send_goal(goal, done_cb=self._done_docking, feedback_cb=self._feedback_docking)
+        rospy.logdebug("Autodocking Goal: Sent.")
+        rospy.on_shutdown(self._docking_client.cancel_goal)
 
     def _go_dock(self):
         """Runs auto docking routine for a turtlebot."""
         if rospy.is_shutdown(): 
             return        
-        goal = AutoDockingGoal()
-        self._client.send_goal(goal, done_cb=self._doneCb, feedback_cb=self._feedbackCb)
-        rospy.logdebug("Goal: Sent.")
-        rospy.on_shutdown(self._client.cancel_goal)
-        self._doing_docking = False
+        goal = MoveBaseGoal()
+        goal.target_pose.header.frame_id = "map"
+        goal.target_pose.pose.position.x = self.POSITION_GOAL["position"][0]
+        goal.target_pose.pose.position.y = self.POSITION_GOAL["position"][1]
+        goal.target_pose.pose.position.z = self.POSITION_GOAL["position"][2]
+        goal.target_pose.pose.orientation.x = self.POSITION_GOAL["orientation"][0]
+        goal.target_pose.pose.orientation.y = self.POSITION_GOAL["orientation"][1]
+        goal.target_pose.pose.orientation.z = self.POSITION_GOAL["orientation"][2]
+        goal.target_pose.pose.orientation.w = self.POSITION_GOAL["orientation"][3]
+        self._navigation_client.send_goal(goal, done_cb=self._done_navigating)
+        rospy.on_shutdown(self._navigation_client.cancel_goal)
     
     def _listen_batteries(self, data):
         """Callback that checks the batteries charge and triggers the auto docking routine if the charge is low."""
-        batteries_names = ["/Power System/Laptop Battery", "/Power System/Battery"]
-        batteries_values = [element.values for element in data.status if element.name in batteries_names]
-        laptop_battery_percentage = float(filter(lambda x: x.key == "Percentage (%)", batteries_values[0])[0].value)
-        kobuki_battery_percentage = float(filter(lambda x: x.key == "Percent", batteries_values[1])[0].value)
-        
         if self._doing_docking is False:
-            if kobuki_battery_percentage < self.BATTERY_THRESHOLD or laptop_battery_percentage < self.BATTERY_THRESHOLD:
-                self._go_dock()
-                self._doing_docking = True
+            batteries_names = ["/Power System/Laptop Battery", "/Power System/Battery"]
+            batteries_values = [element.values for element in data.status if element.name in batteries_names]
+            if len(batteries_values) == 2:
+                laptop_battery_percentage = float(filter(lambda x: x.key == "Percentage (%)", batteries_values[0])[0].value)
+                kobuki_battery_percentage = float(filter(lambda x: x.key == "Percent", batteries_values[1])[0].value)
+                if kobuki_battery_percentage < self.BATTERY_THRESHOLD or laptop_battery_percentage < self.BATTERY_THRESHOLD:
+                    self._go_dock()
+                    self._doing_docking = True
 
     def run(self):
         rospy.spin()

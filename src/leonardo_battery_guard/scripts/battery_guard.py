@@ -8,6 +8,13 @@
 #
 # author: Patricio Tula
 # reviewed by: Ernesto Corbellini / Julian Mateu
+#
+# TODO's in general
+# +(tul1) Add mechanism that allow to run this routine externally by running a command or publishing in a topic. This is going to be very helpful
+#   to debug in Leonardo independently of its battery charge.
+# +
+#
+
 
 import rospy
 
@@ -30,9 +37,10 @@ class AutoDocking(object):
         # Logic attributes
         self._doing_docking = False
         # Constants
-        self.BATTERY_THRESHOLD = rospy.get_param("~battery_threshold", 10)
-        # TODO set POSITION_GOAL through ros params
-        # TODO find out the right position and orientation 
+        # TODO(tul1) replace 100 for this -> rospy.get_param("~battery_threshold", 20)
+        self.BATTERY_THRESHOLD = 100 
+        # TODO(tul1) set POSITION_GOAL through ros params
+        # TODO(tul1) find out the right position and orientation 
         self.POSITION_GOAL = {"position": [0, 0, 0], "orientation":[0,0,0,0]}
 
     def _done_docking(self, status, result):
@@ -68,7 +76,9 @@ class AutoDocking(object):
         if rospy.is_shutdown(): 
             return        
         goal = MoveBaseGoal()
-        goal.target_pose.header.frame_id = "map"
+        # TODO(tul1) I suspect that 'frame_id' could the problem here
+        goal.target_pose.header.frame_id = "/map"
+        goal.target_pose.header.stamp = rospy.Time.now()
         goal.target_pose.pose.position.x = self.POSITION_GOAL["position"][0]
         goal.target_pose.pose.position.y = self.POSITION_GOAL["position"][1]
         goal.target_pose.pose.position.z = self.POSITION_GOAL["position"][2]

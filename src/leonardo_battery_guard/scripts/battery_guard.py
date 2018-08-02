@@ -77,7 +77,7 @@ class AutoDocking(object):
             return        
         goal = MoveBaseGoal()
         # TODO(tul1) I suspect that 'frame_id' could the problem here
-        goal.target_pose.header.frame_id = "/map"
+        goal.target_pose.header.frame_id = "map"
         goal.target_pose.header.stamp = rospy.Time.now()
         goal.target_pose.pose.position.x = self.POSITION_GOAL["position"][0]
         goal.target_pose.pose.position.y = self.POSITION_GOAL["position"][1]

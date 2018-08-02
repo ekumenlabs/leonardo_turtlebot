@@ -94,12 +94,16 @@ class AutoDocking(object):
         if self._doing_docking is False:
             batteries_names = ["/Power System/Laptop Battery", "/Power System/Battery"]
             batteries_values = [element.values for element in data.status if element.name in batteries_names]
-            if len(batteries_values) == 2:
-                laptop_battery_percentage = float(filter(lambda x: x.key == "Percentage (%)", batteries_values[0])[0].value)
-                kobuki_battery_percentage = float(filter(lambda x: x.key == "Percent", batteries_values[1])[0].value)
-                if kobuki_battery_percentage < self.BATTERY_THRESHOLD or laptop_battery_percentage < self.BATTERY_THRESHOLD:
-                    self._go_dock()
-                    self._doing_docking = True
+            if len(batteries_values) == 3:
+                charging_state = filter(lambda x: x.key == "Charging state", batteries_values[0])[0].value
+                batteries_charging = (charging_state is not "discharging")
+                print "batteries_charging: " + batteries_charging
+                if batteries_charging is False:
+                    laptop_battery_percentage = float(filter(lambda x: x.key == "Percentage (%)", batteries_values[0])[0].value)
+                    kobuki_battery_percentage = float(filter(lambda x: x.key == "Percent", batteries_values[1])[0].value)
+                    if kobuki_battery_percentage < self.BATTERY_THRESHOLD or laptop_battery_percentage < self.BATTERY_THRESHOLD:
+                        self._go_dock()
+                        self._doing_docking = True
 
     def run(self):
         rospy.spin()

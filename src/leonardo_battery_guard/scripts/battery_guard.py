@@ -41,7 +41,6 @@ class AutoDocking(object):
         self._doing_docking = False
         # Constants
         self.BATTERY_THRESHOLD = rospy.get_param("~battery_threshold", 20)
-        # TODO(tul1) set POSITION_GOAL through ros params
         # TODO(tul1) find out the right position and orientation 
         self.POSITION_GOAL = {"position": [-0.6, -0.3, 0], "orientation":[0,0,0,1]}
 

@@ -95,7 +95,7 @@ class AutoDocking(object):
             batteries_names = ["/Power System/Laptop Battery", "/Power System/Battery"]
             batteries_values = [element.values for element in data.status if element.name in batteries_names]
             if len(batteries_values) > 0:
-                charging_state = str(filter(lambda x: x.key == "Charging State", batteries_values[0])[0].value)
+                charging_state = str(filter(lambda x: x.key == "Charging State", batteries_values[1])[0].value)
                 batteries_charging = (charging_state != "Not Charging")
                 if batteries_charging is False:
                     laptop_battery_percentage = float(filter(lambda x: x.key == "Percentage (%)", batteries_values[0])[0].value)

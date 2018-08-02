@@ -10,8 +10,6 @@
 # reviewed by: Ernesto Corbellini / Julian Mateu
 #
 # TODO's in general
-# +(tul1) Add mechanism that allow to run this routine externally by running a command or publishing in a topic. This is going to be very helpful
-#   to debug in Leonardo independently of its battery charge.
 # +
 #
 
@@ -23,25 +21,34 @@ from kobuki_msgs.msg import AutoDockingAction, AutoDockingGoal
 from actionlib_msgs.msg import GoalStatus
 from diagnostic_msgs.msg import DiagnosticArray
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+from std_srvs.srv import Trigger
 
 
 class AutoDocking(object):
     def __init__(self):
         # Node
         self._ros_node = rospy.init_node("dock_drive_client", anonymous=True)
+        # Services
+        self._service = rospy.Service('run_autodocking', Trigger, self._run_service)
         # Action clients 
         self._docking_client = actionlib.SimpleActionClient("dock_drive_action", AutoDockingAction)
+        self._docking_client.wait_for_server()
         self._navigation_client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
+        self._navigation_client.wait_for_server()
         # Subscribed topics
         self._diagnostic_agg_sub = rospy.Subscriber("/diagnostics_agg", DiagnosticArray, self._listen_batteries)
         # Logic attributes
         self._doing_docking = False
         # Constants
-        # TODO(tul1) replace 100 for this -> rospy.get_param("~battery_threshold", 20)
-        self.BATTERY_THRESHOLD = 100 
+        self.BATTERY_THRESHOLD = rospy.get_param("~battery_threshold", 20)
         # TODO(tul1) set POSITION_GOAL through ros params
         # TODO(tul1) find out the right position and orientation 
-        self.POSITION_GOAL = {"position": [0, 0, 0], "orientation":[0,0,0,0]}
+        self.POSITION_GOAL = {"position": [-0.6, -0.3, 0], "orientation":[0,0,0,1]}
+
+    def _run_service(self, req):
+        print "service working!"
+        self._go_dock()
+        return Trigger()
 
     def _done_docking(self, status, result):
         """Callback that prints the action goal status and change the state of _doing_docking attribute. 
@@ -76,7 +83,6 @@ class AutoDocking(object):
         if rospy.is_shutdown(): 
             return        
         goal = MoveBaseGoal()
-        # TODO(tul1) I suspect that 'frame_id' could the problem here
         goal.target_pose.header.frame_id = "map"
         goal.target_pose.header.stamp = rospy.Time.now()
         goal.target_pose.pose.position.x = self.POSITION_GOAL["position"][0]
@@ -94,7 +100,8 @@ class AutoDocking(object):
         if self._doing_docking is False:
             batteries_names = ["/Power System/Laptop Battery", "/Power System/Battery"]
             batteries_values = [element.values for element in data.status if element.name in batteries_names]
-            if len(batteries_values) > 0:
+            if len(batteries_values) == 2:
+                # TODO contemplar si charging state no esta
                 charging_state = str(filter(lambda x: x.key == "Charging State", batteries_values[1])[0].value)
                 batteries_charging = (charging_state != "Not Charging")
                 if batteries_charging is False:

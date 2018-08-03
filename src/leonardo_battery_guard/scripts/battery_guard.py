@@ -42,10 +42,9 @@ class AutoDocking(object):
         # Constants
         self.BATTERY_THRESHOLD = rospy.get_param("~battery_threshold", 20)
         # TODO(tul1) find out the right position and orientation 
-        self.POSITION_GOAL = {"position": [-0.6, -0.3, 0], "orientation":[0,0,0,1]}
+        self.POSITION_GOAL = {"position": [-0.3, -0.3, 0], "orientation":[0,0,0,1]}
 
     def _run_service(self, req):
-        print "service working!"
         self._go_dock()
         return Trigger()
 
@@ -71,7 +70,6 @@ class AutoDocking(object):
 
     def _done_navigating(self, status, result):
         """Runs auto docking routine for a turtlebot."""
-        rospy.logdebug("Result - [ActionServer: " + state + "]: " + result.text)
         goal = AutoDockingGoal()
         self._docking_client.send_goal(goal, done_cb=self._done_docking, feedback_cb=self._feedback_docking)
         rospy.logdebug("Autodocking Goal: Sent.")

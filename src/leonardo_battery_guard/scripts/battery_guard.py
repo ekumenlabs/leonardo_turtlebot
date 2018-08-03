@@ -9,10 +9,6 @@
 # author: Patricio Tula
 # reviewed by: Ernesto Corbellini / Julian Mateu
 #
-# TODO's in general
-# +
-#
-
 
 import rospy
 
@@ -42,15 +38,16 @@ class AutoDocking(object):
         # Constants
         self.BATTERY_THRESHOLD = rospy.get_param("~battery_threshold", 20)
         # TODO(tul1) find out the right position and orientation 
-        self.POSITION_GOAL = {"position": [1.48, -1.85, 0], "orientation":[0, 0, -0.63, 0.78]}
+        self.POSITION_GOAL = {"position": [1.48, -1.85, 0.0], "orientation":[0.0, 0.0, -0.63, 0.78]}
 
     def _run_service(self, req):
+        """Run docking routine"""
         self._go_dock()
         return Trigger()
 
-    def _done_docking(self, status, result):
-        """Callback that prints the action goal status and change the state of _doing_docking attribute. 
-        This function is called when the action goal is reached."""
+    def _parse_GoalStatus(self, status):
+        """Convert GoalStatus into strings"""
+        state = ""
         if status == GoalStatus.PENDING: state="PENDING"
         elif status == GoalStatus.ACTIVE: state="ACTIVE"
         elif status == GoalStatus.PREEMPTED: state="PREEMPTED"
@@ -61,24 +58,36 @@ class AutoDocking(object):
         elif status == GoalStatus.RECALLING: state="RECALLING"
         elif status == GoalStatus.RECALLED: state="RECALLED"
         elif status == GoalStatus.LOST: state="LOST"
-        rospy.logdebug("Result - [ActionServer: " + state + "]: " + result.text)
+        return state
+
+    def _done_docking(self, status, result):
+        """Callback that prints the action goal status and change the state of _doing_docking attribute. 
+        This function is called when the action goal is reached."""
+        state = self._parse_GoalStatus(status)
+        rospy.logdebug("Docking - Result - [ActionServer: " + state + "]: " + result.text)
         self._doing_docking = False
 
     def _feedback_docking(self, feedback):
         """Callback that just prints the action feedback."""
-        rospy.logdebug("Feedback: [DockDrive: " + feedback.state + "]: " + feedback.text)
+        rospy.logdebug("Docking - Feedback: [DockDrive: " + feedback.state + "]: " + feedback.text)
 
     def _done_navigating(self, status, result):
         """Runs auto docking routine for a turtlebot."""
+        state = self._parse_GoalStatus(status)
+        rospy.logdebug("Navigation - Result - [ActionServer: " + state + "]: " + result)
         goal = AutoDockingGoal()
         self._docking_client.send_goal(goal, done_cb=self._done_docking, feedback_cb=self._feedback_docking)
         rospy.logdebug("Autodocking Goal: Sent.")
         rospy.on_shutdown(self._docking_client.cancel_goal)
 
+    def __feedback_navigating(self, feedback):
+        """Callback that just prints the action feedback."""
+        rospy.logdebug("Navigation - Feedback: [Navigation: " + feedback.base_position + "]")
+
     def _go_dock(self):
         """Runs auto docking routine for a turtlebot."""
         if rospy.is_shutdown(): 
-            return        
+            return
         goal = MoveBaseGoal()
         goal.target_pose.header.frame_id = "map"
         goal.target_pose.header.stamp = rospy.Time.now()
@@ -89,7 +98,9 @@ class AutoDocking(object):
         goal.target_pose.pose.orientation.y = self.POSITION_GOAL["orientation"][1]
         goal.target_pose.pose.orientation.z = self.POSITION_GOAL["orientation"][2]
         goal.target_pose.pose.orientation.w = self.POSITION_GOAL["orientation"][3]
-        self._navigation_client.send_goal(goal, done_cb=self._done_navigating)
+        self._navigation_client.send_goal(goal, done_cb=self._done_navigating, feedback_cb=self._feedback_navigating)
+        rospy.logdebug("Navigation Goal: Sent.")
+        rospy.logdebug(goal)
         rospy.on_shutdown(self._navigation_client.cancel_goal)
     
     def _listen_batteries(self, data):
@@ -98,7 +109,6 @@ class AutoDocking(object):
             batteries_names = ["/Power System/Laptop Battery", "/Power System/Battery"]
             batteries_values = [element.values for element in data.status if element.name in batteries_names]
             if len(batteries_values) == 2:
-                # TODO contemplar si charging state no esta
                 charging_state = str(filter(lambda x: x.key == "Charging State", batteries_values[1])[0].value)
                 batteries_charging = (charging_state != "Not Charging")
                 if batteries_charging is False:
@@ -109,6 +119,7 @@ class AutoDocking(object):
                         self._doing_docking = True
 
     def run(self):
+        """Runs the node threat"""
         rospy.spin()
 
 

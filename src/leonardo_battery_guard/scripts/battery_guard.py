@@ -38,8 +38,7 @@ class AutoDocking(object):
         # Constants
         self.BATTERY_THRESHOLD = rospy.get_param("~battery_threshold", 20)
         # TODO(tul1) find out the right position and orientation 
-        self.POSITION_GOAL = {"position": [-0.544, -0.378, 0.0], "orientation":[0.0, 0.0, 0.945, 0.327]}
-
+        self.POSITION_GOAL = {"position": [-1.017, -0.414, 0.0], "orientation":[0.0, 0.0, 0.95, 0.312]}
     def _run_service(self, req):
         """Run docking routine"""
         self._go_dock()

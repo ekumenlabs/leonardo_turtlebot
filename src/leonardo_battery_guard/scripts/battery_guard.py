@@ -11,6 +11,7 @@
 #
 
 import rospy
+import ast
 
 import actionlib
 from kobuki_msgs.msg import AutoDockingAction, AutoDockingGoal
@@ -38,7 +39,10 @@ class AutoDocking(object):
         # Constants
         self.BATTERY_THRESHOLD = rospy.get_param("~battery_threshold", 20)
         # TODO(tul1) find out the right position and orientation 
-        self.POSITION_GOAL = {"position": [-1.017, -0.414, 0.0], "orientation":[0.0, 0.0, 0.95, 0.312]}
+        self.POSITION_GOAL_DEFAULT = "{'position': [-1.017, -0.414, 0.0],'orientation':[0.0, 0.0, 0.95, 0.312]}"
+        position_goal = rospy.get_param("~position_goal", self.POSITION_GOAL_DEFAULT)
+        self.POSITION_GOAL = ast.literal_eval(position_goal)
+        
     def _run_service(self, req):
         """Run docking routine"""
         self._go_dock()

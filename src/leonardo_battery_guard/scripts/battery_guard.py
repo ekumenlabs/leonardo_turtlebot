@@ -46,7 +46,7 @@ class AutoDocking(object):
     def _run_service(self, req):
         """Run docking routine"""
         self._go_dock()
-        return Trigger()
+        return Trigger(True, "success")
 
     def _parse_GoalStatus(self, status):
         """Convert GoalStatus into strings"""
@@ -77,7 +77,7 @@ class AutoDocking(object):
     def _done_navigating(self, status, result):
         """Runs auto docking routine for a turtlebot."""
         state = self._parse_GoalStatus(status)
-        rospy.logdebug("Navigation - Result - [ActionServer: " + state + "]: " + result)
+        rospy.logdebug("Navigation - Result - [ActionServer: " + str(state) + "]: " + result)
         goal = AutoDockingGoal()
         self._docking_client.send_goal(goal, done_cb=self._done_docking, feedback_cb=self._feedback_docking)
         rospy.logdebug("Autodocking Goal: Sent.")

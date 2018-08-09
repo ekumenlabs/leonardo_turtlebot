@@ -1,6 +1,6 @@
 <launch>
     <node name="dock_drive_client" pkg="leonardo_battery_guard" type="battery_guard.py" clear_params="true" output="screen">
-        <param name="battery_threshold" value="10" />
+        <param name="battery_threshold" value="20" />
         <param name="position_goal" value="{'position': [-1.017, -0.414, 0.0], 'orientation':[0.0, 0.0, 0.95, 0.312]}" />
     </node>
 </launch>

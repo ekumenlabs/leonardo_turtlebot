@@ -18,7 +18,7 @@ from kobuki_msgs.msg import AutoDockingAction, AutoDockingGoal
 from actionlib_msgs.msg import GoalStatus
 from diagnostic_msgs.msg import DiagnosticArray
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
-from std_srvs.srv import Trigger
+from std_srvs.srv import Trigger, TriggerResponse
 
 
 class AutoDocking(object):
@@ -38,7 +38,6 @@ class AutoDocking(object):
         self._doing_docking = False
         # Constants
         self.BATTERY_THRESHOLD = rospy.get_param("~battery_threshold", 10)
-        # TODO(tul1) find out the right position and orientation 
         self.POSITION_GOAL_DEFAULT = "{'position': [-1.017, -0.414, 0.0],'orientation':[0.0, 0.0, 0.95, 0.312]}"
         position_goal = rospy.get_param("~position_goal", self.POSITION_GOAL_DEFAULT)
         self.POSITION_GOAL = ast.literal_eval(position_goal)
@@ -46,7 +45,7 @@ class AutoDocking(object):
     def _run_service(self, req):
         """Run docking routine"""
         self._go_dock()
-        return Trigger(True, "success")
+        return TriggerResponse(True, "success")
 
     def _parse_GoalStatus(self, status):
         """Convert GoalStatus into strings"""
@@ -77,7 +76,7 @@ class AutoDocking(object):
     def _done_navigating(self, status, result):
         """Runs auto docking routine for a turtlebot."""
         state = self._parse_GoalStatus(status)
-        rospy.logdebug("Navigation - Result - [ActionServer: " + str(state) + "]: " + result)
+        rospy.logdebug("Navigation - Result - [ActionServer: " + str(state) + "]: " + str(result))
         goal = AutoDockingGoal()
         self._docking_client.send_goal(goal, done_cb=self._done_docking, feedback_cb=self._feedback_docking)
         rospy.logdebug("Autodocking Goal: Sent.")

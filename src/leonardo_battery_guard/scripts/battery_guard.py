@@ -83,7 +83,7 @@ class AutoDocking(object):
         rospy.logdebug("Autodocking Goal: Sent.")
         rospy.on_shutdown(self._docking_client.cancel_goal)
 
-    def __feedback_navigating(self, feedback):
+    def _feedback_navigating(self, feedback):
         """Callback that just prints the action feedback."""
         rospy.logdebug("Navigation - Feedback: [Navigation: " + feedback.base_position + "]")
 

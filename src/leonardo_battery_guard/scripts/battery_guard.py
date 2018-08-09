@@ -85,8 +85,7 @@ class AutoDocking(object):
 
     def _feedback_navigating(self, feedback):
         """Callback that just prints the action feedback."""
-        # TODO(tul1) fix feedback.base_position isn't an string. 
-        # rospy.logdebug("Navigation - Feedback: [Navigation: " + feedback.base_position + "]")
+        rospy.logdebug("Navigation - Feedback: [Navigation: " + str(feedback.base_position) + "]")
 
     def _go_dock(self):
         """Runs auto docking routine for a turtlebot."""

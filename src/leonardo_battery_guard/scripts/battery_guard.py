@@ -37,7 +37,7 @@ class AutoDocking(object):
         # Logic attributes
         self._doing_docking = False
         # Constants
-        self.BATTERY_THRESHOLD = rospy.get_param("~battery_threshold", 20)
+        self.BATTERY_THRESHOLD = rospy.get_param("~battery_threshold", 10)
         # TODO(tul1) find out the right position and orientation 
         self.POSITION_GOAL_DEFAULT = "{'position': [-1.017, -0.414, 0.0],'orientation':[0.0, 0.0, 0.95, 0.312]}"
         position_goal = rospy.get_param("~position_goal", self.POSITION_GOAL_DEFAULT)
@@ -85,7 +85,8 @@ class AutoDocking(object):
 
     def _feedback_navigating(self, feedback):
         """Callback that just prints the action feedback."""
-        rospy.logdebug("Navigation - Feedback: [Navigation: " + feedback.base_position + "]")
+        # TODO(tul1) fix feedback.base_position isn't an string. 
+        # rospy.logdebug("Navigation - Feedback: [Navigation: " + feedback.base_position + "]")
 
     def _go_dock(self):
         """Runs auto docking routine for a turtlebot."""

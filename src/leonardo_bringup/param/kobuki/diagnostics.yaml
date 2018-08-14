@@ -22,6 +22,7 @@ analyzers:
     type: diagnostic_aggregator/GenericAnalyzer
     path: 'Sensors'
     timeout: 5.0
+    maximum_current_flow: 15.0
     contains: ['Cliff Sensor', 'Wall Sensor', 'Wheel Drop', 'Motor Current', 'Gyro Sensor']
     remove_prefix: mobile_base_nodelet_manager
   input_ports:
